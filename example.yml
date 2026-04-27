@@ -1,0 +1,32 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Install Apache and dependencies
+      package:
+        name:
+          - apache2
+          - python3-apt
+        state: present
+
+    - name: Copy index.html
+      copy:
+        src: files/site/index.html
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Create symbolic link
+      file:
+        src: /var/www/html/index.html
+        dest: /var/www/html/home.html
+        state: link
+
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+        enabled: yes
